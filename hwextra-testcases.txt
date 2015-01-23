@@ -1,0 +1,136 @@
+Test Case 1 - free()ing pointers that were never allocated
+Input:
+	int x;
+	free(&x);
+
+Expected Output:
+	main.c:20: error: Cannot free memory from a variable that has no reserved memory.
+
+Test Case 2 - free()ing pointers to dynamic memory that were not returned from malloc()
+Input:
+	char *p;
+	p = (char*)malloc(5);
+	free(p+20);
+
+Expected Output:
+	main.c:25: error: Cannot free memory that was not returned from malloc or is not in the heap.
+
+Test Case 3 - redundant free()ing of the same pointer
+Input:
+	char *p;
+	p = (char*)malloc(5);
+	free(p);
+	free(p);
+
+
+Expected Output:
+	main.c:32: error: Cannot free memory from a variable that has no reserved memory.
+
+Test Case 4 - malloc()ing a variable of size 0
+Input:
+	char *p;
+	p = (char*)malloc(0);
+	free(p);
+
+Expected Output:
+	main.c:37: error: Cannot malloc memory of size 0.
+
+Test Case 5 - free()ing a pointer that points to NULL
+Input:
+	char *null = (char*)malloc(10);
+	null = NULL;
+	free((void*)null);
+
+Expected Output:
+	main.c:44: error: Can't free pointer to NULL.
+
+ Test Case 6 - calloc()ing
+Input:
+	char *str = (char *) calloc(1, 6);
+	
+	str[0] = 'h';
+	str[1] = 'i';
+	str[2] = '\0';
+	
+	int i;
+	for(i = 0; i < 6; i++){
+		printf("str[%d]: %c\n", i, str[i]);
+	}
+
+Expected Output:
+	str[0] = h
+	str[1] = i
+	str[2] = 
+	str[3] = 0
+	str[4] = 0
+	str[5] = 0
+	
+
+Test Case 7 - Saturation/using SBRK() to extend heap
+Input:
+	char *str = (char*)malloc(1025);
+
+Expected Output:
+	SBKR makes first chunk size of 1025
+	
+
+Test Case 8 - free()ing ptr not in heap
+Input:
+	int *ptr;
+	free(ptr);
+
+Expected Output:
+	main.c:66: error: Can't free pointer to NULL.
+	
+Test Case 9 - realloc()
+Input:
+	char *str = (char *) calloc(1, 6);
+	
+	str[0] = 'h';
+	str[1] = 'e';
+	str[2] = 'l';
+	str[3] = 'l';
+	str[4] = 'o';
+	str[5] = '\0';
+	
+	int i;
+	for(i = 0; i < 6; i++){
+		printf("str[%d]: %c\n", i, str[i]);
+	}
+	
+	str = (char*) realloc(str, 4);
+	for(i = 0; i < 4; i++){
+		printf("str[%d]: %c\n", i, str[i]);
+	}
+	
+
+Expected Output:
+	str[0] = h
+	str[1] = e
+	str[2] = l
+	str[3] = l
+	str[4] = o
+	str[5] = 
+	str[0] = h
+	str[1] = e
+	str[2] = l
+	str[3] = l
+
+Test Case 10 - successful output
+Input:	
+	char *str = (char *) malloc(6);
+	str[0] = 'H';
+	str[1] = 'e';
+	str[2] = 'l';
+	str[3] = 'l';
+	str[4] = 'o';
+	str[5] = '\0';
+	
+	printf("str: %s\n", str);
+	
+	free(str);
+	
+
+Expected Output:
+str: Hello
+
